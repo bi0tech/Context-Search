@@ -74,9 +74,11 @@ function checkValid(url) {
   }
 
   // Check that URL is a keyword search (i.e. containing "%s")
-  if (url.indexOf("%s") > -1) {
+  //TODO: add list of check strings
+  
+  //if (url.indexOf("%s") > -1) {
       isValidWildcard = true;
-}
+  //}
 
   if (isValidProtocol && isValidWildcard) {
     isValid = true;
@@ -181,19 +183,39 @@ function goTo(info, parentTab) {
     }
 
     openerTabId = parentTab.id;
-
-    createTab(info, active, openerTabId);
+    let myinfo = varReplace(info);
+    
+    //createTab(info, active, openerTabId);
+    browser.tabs.create({
+        url: myinfo,
+        active: active,
+        openerTabId: openerTabId
+    });
   });
 }
 
-// Replace the browser standard %s for keyword searches with
-// the selected text on the page and make a tab
-function createTab(info, active, openerTabId) {
-  browser.tabs.create({
-    url: info.menuItemId.replace("%s", encodeURIComponent(info.selectionText)),
-    active: active,
-    openerTabId: openerTabId
-  });
+// Replace search vars [%s, %d, %0..%9] with
+// the selected text and originating page domain
+function varReplace(info) {
+  let infoArray = info.selectionText.split(/[ ]+/);
+  
+  //standard %s replace with full string
+  let myinfo = info.menuItemId.replace("%s", encodeURIComponent(info.selectionText));
+  
+  // %d replace with originating domain
+  myinfo = myinfo.replace("%d", encodeURIComponent(info.pageUrl.split('/')[2]));
+  
+  // word by word replace using %0..%9
+  for (var i=0; i < infoArray.length; i++) {
+        myinfo = myinfo.replace("$" + i.toString(), encodeURIComponent(infoArray[i]));
+  }
+  
+  // remove %0..%9 vars exceeding word length of selection text
+  for (var i=infoArray.length; i<10; i++) {
+        myinfo = myinfo.replace("$" + i.toString(), "");
+  }
+  
+  return myinfo;
 }
 
 browser.runtime.getBrowserInfo().then(parseBrowserInfo);
