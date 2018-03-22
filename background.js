@@ -194,7 +194,7 @@ function goTo(info, parentTab) {
   });
 }
 
-// Replace search vars [%s, %d, %0..%9] with
+// Replace search vars [%s, %d, $0..$9] with
 // the selected text and originating page domain
 function varReplace(info) {
   let infoArray = info.selectionText.split(/[ ]+/);
@@ -205,7 +205,7 @@ function varReplace(info) {
   // %d replace with originating domain
   myinfo = myinfo.replace("%d", encodeURIComponent(info.pageUrl.split('/')[2]));
   
-  // word by word replace using %0..%9
+  // word by word replace using $0..$9
   for (var i=0; i < infoArray.length; i++) {
         myinfo = myinfo.replace("$" + i.toString(), encodeURIComponent(infoArray[i]));
   }
