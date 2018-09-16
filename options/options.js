@@ -99,17 +99,6 @@ function selectedFile(e) {
     }
 }
 
-function readFileAsArrayBuffer(file) {
-        return new Promise(resolve => {
-            const fileReader = new FileReader();
-
-            fileReader.addEventListener('loadend', event => {
-                resolve(event.target.result);
-            });
-            fileReader.readAsArrayBuffer(file);
-        });
-}
-
 openFile = document.querySelector('#openFile');
 openFile.addEventListener('change', selectedFile);
 
